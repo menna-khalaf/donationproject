@@ -2,6 +2,7 @@ from django.urls import path
 from .views import UserRegisterView, UserProfileEditView , ActivateAccountView , email_login_view
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LoginView
+from .views import UserProfileView
 
 app_name = 'users'
 urlpatterns = [
@@ -10,5 +11,6 @@ urlpatterns = [
     path('profile/edit/', UserProfileEditView.as_view(), name='profile-edit'),
     path('activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('login/', email_login_view, name='login'),
+    path('profile/', UserProfileView.as_view(), name='profile'),
 
 ]

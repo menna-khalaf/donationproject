@@ -1,0 +1,22 @@
+<h2>My Profile</h2>
+<p><strong>Name:</strong> {{ user_obj.first_name }} {{ user_obj.last_name }}</p>
+<p><strong>Email:</strong> {{ user_obj.email }}</p>
+<p><strong>Mobile Phone:</strong> {{ user_obj.mobile_phone }}</p>
+<p><strong>Profile Picture:</strong><br>
+    {% if user.profile_picture %}
+  <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="120">
+{% else %}
+  <p>No profile picture uploaded.</p>
+{% endif %}
+
+</p>
+<p><strong>Birthdate:</strong> {{ user_obj.birthdate }}</p>
+<p><strong>Facebook Profile:</strong> {{ user_obj.facebook_profile }}</p>
+<p><strong>Country:</strong> {{ user_obj.country }}</p>
+
+<!-- You can add these sections later:
+<h3>My Projects</h3>
+<h3>My Donations</h3>
+-->
+
+<a href="{% url 'users:profile-edit' %}">Edit Profile</a>

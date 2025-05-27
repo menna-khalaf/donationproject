@@ -14,6 +14,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model , authenticate, login
 from django.contrib import messages
 
+from django.views.generic import TemplateView
+
 # Registration
 class UserRegisterView(CreateView):
     model = User
@@ -97,3 +99,14 @@ def email_login_view(request):
                     return redirect('users:profile')
             messages.error(request, "Invalid email or password.")
     return render(request, "users/login.html", {"form": form})
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['user_obj'] = user
+        # Projects and donations will be added later
+        return context
