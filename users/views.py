@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy , reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import UserRegistrationForm, UserProfileEditForm
+from .forms import UserRegistrationForm, UserProfileEditForm , EmailLoginForm
 from .models import User
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
@@ -11,7 +11,7 @@ from .tokens import account_activation_token
 from django.views import View
 from django.shortcuts import render, redirect
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model , authenticate, login
 from django.contrib import messages
 
 # Registration
@@ -79,3 +79,21 @@ class ActivateAccountView(View):
             return redirect('users:login')  # You need to create this view next
         else:
             return render(request, 'users/activation_invalid.html')
+
+def email_login_view(request):
+    form = EmailLoginForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+            if user:
+                user = authenticate(request, username=user.username, password=password)
+                if user is not None:
+                    login(request, user)
+                    return redirect('users:profile')
+            messages.error(request, "Invalid email or password.")
+    return render(request, "users/login.html", {"form": form})

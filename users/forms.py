@@ -60,3 +60,6 @@ class UserProfileEditForm(forms.ModelForm):
             'first_name', 'last_name', 'mobile_phone', 'profile_picture',
             'birthdate', 'facebook_profile', 'country'
         ]
+class EmailLoginForm(forms.Form):
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
