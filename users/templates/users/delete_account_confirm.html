@@ -1,0 +1,15 @@
+<h2>Delete Account</h2>
+<p>Are you sure you want to delete your account? This action cannot be undone.</p>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" style="background: red; color: white;">Delete Account</button>
+    <a href="{% url 'users:profile' %}">Cancel</a>
+</form>

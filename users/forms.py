@@ -63,3 +63,10 @@ class UserProfileEditForm(forms.ModelForm):
 class EmailLoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
+
+class UserDeleteForm(forms.Form):
+    password = forms.CharField(
+        label="Confirm your password",
+        widget=forms.PasswordInput,
+        help_text="Enter your password to confirm account deletion."
+    )

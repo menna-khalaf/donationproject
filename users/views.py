@@ -11,10 +11,12 @@ from .tokens import account_activation_token
 from django.views import View
 from django.shortcuts import render, redirect
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth import get_user_model , authenticate, login
+from django.contrib.auth import get_user_model , authenticate, login , logout
 from django.contrib import messages
 
 from django.views.generic import TemplateView
+
+from .forms import UserDeleteForm
 
 # Registration
 class UserRegisterView(CreateView):
@@ -110,3 +112,24 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['user_obj'] = user
         # Projects and donations will be added later
         return context
+
+class UserDeleteView(LoginRequiredMixin, View):
+    template_name = 'users/delete_account_confirm.html'
+
+    def get(self, request):
+        form = UserDeleteForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = UserDeleteForm(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data['password']
+            user = request.user
+            if authenticate(username=user.username, password=password):
+                user.delete()
+                logout(request)
+                messages.success(request, "Your account has been deleted.")
+                return redirect('home')  # or your homepage name
+            else:
+                messages.error(request, "Incorrect password. Account not deleted.")
+        return render(request, self.template_name, {'form': form})
