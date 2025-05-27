@@ -16,7 +16,7 @@ class UserRegisterView(CreateView):
         user.set_password(form.cleaned_data['password1'])
         user.is_active = False  # For activation step
 
-        # Auto-generate a unique username from email
+        # Auto-generate a unique username from emaill
         email = form.cleaned_data['email']
         base_username = email.split('@')[0]
         username = base_username
