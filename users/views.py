@@ -1,8 +1,18 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy , reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import UserRegistrationForm, UserProfileEditForm
 from .models import User
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from .tokens import account_activation_token
+
+from django.views import View
+from django.shortcuts import render, redirect
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import get_user_model
+from django.contrib import messages
 
 # Registration
 class UserRegisterView(CreateView):
@@ -27,7 +37,17 @@ class UserRegisterView(CreateView):
         user.username = username
 
         user.save()
-        # TODO: Send activation email in next step
+
+        # Send activation email
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        activation_link = self.request.build_absolute_uri(
+            reverse('users:activate', kwargs={'uidb64': uid, 'token': token})
+        )
+        subject = 'Activate your account'
+        message = f'Hi {user.first_name},\n\nPlease activate your account by clicking the link below:\n{activation_link}\n\nThis link will expire in 24 hours.'
+        send_mail(subject, message, None, [user.email])
+
         return super().form_valid(form)
 
 
@@ -40,3 +60,22 @@ class UserProfileEditView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+#Activation View
+UserModel = get_user_model()
+
+class ActivateAccountView(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = UserModel.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request, "Your account has been activated! You can now log in.")
+            return redirect('users:login')  # You need to create this view next
+        else:
+            return render(request, 'users/activation_invalid.html')
