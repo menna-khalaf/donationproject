@@ -38,6 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
+    'categories.apps.CategoriesConfig',  # Added for Category model
+    'tags.apps.TagsConfig',              # Added for Tag model
+    'comments.apps.CommentsConfig',      # Added for Comment model
+    'projects.apps.ProjectsConfig',      # Existing app for Project and ProjectPicture models
+    'donations.apps.DonationsConfig',    # Added for Donation model
+    'ratings.apps.RatingsConfig',        # Added for Rating model
+    'reports.apps.ReportsConfig',        # Added for Report model
+    'rest_framework',                    # Django REST Framework for API
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -102,35 +110,39 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings (for activation and password reset)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Use console for testing; switch to SMTP in production
 DEFAULT_FROM_EMAIL = 'noreply@example.com'
 
+# Authentication URLs
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
 LOGIN_URL = '/users/login/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Africa/Cairo'  # Changed to Egypt's time zone for the project
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
+# Static and Media files
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 STATIC_URL = 'static/'
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # Optional: Add token auth if needed
+    ],
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
